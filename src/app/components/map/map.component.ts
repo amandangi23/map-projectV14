@@ -2,6 +2,7 @@
 
 import { Component, OnInit } from '@angular/core';
 
+
 @Component({
   selector: 'app-googlemap',
   templateUrl: './map.component.html',
@@ -71,6 +72,7 @@ export class GooglemapComponent implements OnInit {
   }
 
   getUserLocation() {
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
         const latitude = position.coords.latitude;
@@ -97,6 +99,21 @@ export class GooglemapComponent implements OnInit {
       });
     } else {
       console.error("Geolocation is not supported by your browser.");
+    }
+  };
+
+  markerOptions: google.maps.MarkerOptions = {
+    draggable: true, // Make the marker draggable
+    title: 'Drag me!',
+  };
+
+  // ... (existing code)
+
+  // Function to handle marker position changes
+  markerPositionChanged(event: google.maps.KmlMouseEvent) {
+    if (event.latLng) { 
+      this.center = event.latLng.toJSON();
+      this.display = event.latLng.toJSON();
     }
   }
 }

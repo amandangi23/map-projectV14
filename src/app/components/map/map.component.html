@@ -4,14 +4,15 @@
       <form>
         <div class="row justify-content-center">
           <div class="col-md-11">
-            <div
+            <div 
               class="form-group d-flex mb-3 justify-content-center align-items-center"
             >
               <input
                 type="text"
                 class="form-control mx-1 shadow"
-                placeholder="Search here"
+                placeholder="Search here" 
                 [(ngModel)]="searchCountry"
+                name="search"
               />  
               <button
                 (click)="locateCountry()"
@@ -29,6 +30,12 @@
 
 <div id="map"></div>
 
+<div class="my-3 text-start">
+    <button class="mx-2 btn btn-primary" (click)="getUserLocation()">
+      Get My Current Location
+    </button>
+  </div>
+
 <!-- <google-map height="400px"
             width="750px"
             [center]="center"
@@ -36,13 +43,23 @@
             (mapClick)="moveMap($event)"
             (mapMousemove)="move($event)">
 </google-map> -->
+  
 
-<!-- 
-<div>Latitude: {{display?.lat}}</div> 
+<!-- <div>Latitude: {{display?.lat}}</div> 
 <div>Longitude: {{display?.lng}}</div> -->
 
-<div class="my-3 text-start">
-  <button class="mx-2 btn btn-primary" (click)="getUserLocation()">
-    Get My Current Location
-  </button>
-</div>
+
+
+  <!-- Add a draggable marker to the map -->
+  <google-map height="400px"
+              width="100%"
+              [center]="center"
+              [zoom]="zoom"
+              (mapClick)="moveMap($event)"
+              (mapMousemove)="move($event)">  
+  </google-map>
+
+  <div class="my-3"> 
+    <span class="fw-bold">Latitude:</span> {{display?.lat}},<br> <span class="fw-bold">Longitude:</span> {{display?.lng}}
+  </div> 
+  
