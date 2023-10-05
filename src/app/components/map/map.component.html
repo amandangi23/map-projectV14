@@ -1,23 +1,48 @@
-
-
-<div class="row mt-5 d-flex justify-content-center">
-    <div class="col-md-5">
-        
-        <input class="form-control" type="text" [(ngModel)]="searchCountry" placeholder="Enter country name" />
-        <button class=" my-2 btn btn-success" (click)="locateCountry()">Search</button>
+<div class="container mt-2">
+  <div class="row">
+    <div class="col-md-12">
+      <form>
+        <div class="row justify-content-center">
+          <div class="col-md-11">
+            <div
+              class="form-group d-flex mb-3 justify-content-center align-items-center"
+            >
+              <input
+                type="text"
+                class="form-control mx-1 shadow"
+                placeholder="Search here"
+                [(ngModel)]="searchCountry"
+              />  
+              <button
+                (click)="locateCountry()"
+                class="btn btn-success mx-1 addBtn"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </form> 
     </div>
-
-    
+  </div>
 </div>
 
+<div id="map"></div>
 
-<google-map height="400px"
+<!-- <google-map height="400px"
             width="750px"
             [center]="center"
             [zoom]="zoom"
             (mapClick)="moveMap($event)"
             (mapMousemove)="move($event)">
-</google-map>
+</google-map> -->
 
-<div>Latitude: {{display?.lat}}</div>
-<div>Longitude: {{display?.lng}}</div>
+<!-- 
+<div>Latitude: {{display?.lat}}</div> 
+<div>Longitude: {{display?.lng}}</div> -->
+
+<div class="my-3 text-start">
+  <button class="mx-2 btn btn-primary" (click)="getUserLocation()">
+    Get My Current Location
+  </button>
+</div>
