@@ -1,0 +1,23 @@
+
+
+<div class="row mt-5 d-flex justify-content-center">
+    <div class="col-md-5">
+        
+        <input class="form-control" type="text" [(ngModel)]="searchCountry" placeholder="Enter country name" />
+        <button class=" my-2 btn btn-success" (click)="locateCountry()">Search</button>
+    </div>
+
+    
+</div>
+
+
+<google-map height="400px"
+            width="750px"
+            [center]="center"
+            [zoom]="zoom"
+            (mapClick)="moveMap($event)"
+            (mapMousemove)="move($event)">
+</google-map>
+
+<div>Latitude: {{display?.lat}}</div>
+<div>Longitude: {{display?.lng}}</div>
