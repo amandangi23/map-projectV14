@@ -7,12 +7,13 @@ import { GoogleMapsModule } from '@angular/google-maps'
 import { FormsModule } from '@angular/forms';
 import { SearchLocationComponent } from './components/search-location/search-location.component';
 import { GoogleMapComponent } from './components/google-map/google-map.component';
+import { CurrentLocationComponent } from './components/current-location/current-location.component';
 
 
 @NgModule({
   declarations: [
     AppComponent, 
-    SearchLocationComponent, GoogleMapComponent,
+    SearchLocationComponent, GoogleMapComponent, CurrentLocationComponent,
   ],
   imports: [
     BrowserModule,
