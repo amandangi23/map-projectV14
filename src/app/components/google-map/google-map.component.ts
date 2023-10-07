@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MapService } from 'src/app/services/map.service';
 declare var google: any;
 
 @Component({
@@ -12,21 +13,10 @@ declare var google: any;
 export class GoogleMapComponent implements OnInit  {
 
   
-  constructor() {}
+  constructor(private mapService: MapService) {}
 
    ngOnInit(): void {
-      this.initMap();
-   } 
+       this.mapService.initMap();
+   }  
 
- initMap(): void {
-
-  
-  const map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: 40.7128, lng: -74.0060 },
-    zoom: 10, 
-    
-  });
- 
-
-}
-}
+}  

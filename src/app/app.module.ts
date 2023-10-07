@@ -13,7 +13,7 @@ import { CurrentLocationComponent } from './components/current-location/current-
 @NgModule({
   declarations: [
     AppComponent, 
-    SearchLocationComponent, GoogleMapComponent, CurrentLocationComponent,
+    SearchLocationComponent, GoogleMapComponent, CurrentLocationComponent, 
   ],
   imports: [
     BrowserModule,
