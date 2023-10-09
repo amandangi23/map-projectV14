@@ -11,12 +11,22 @@ declare var google: any;
 
 
 export class GoogleMapComponent implements OnInit  {
+ 
 
   
   constructor(private mapService: MapService) {}
 
    ngOnInit(): void {
        this.mapService.initMap();
-   }  
+   };
+
+
+
+  
+
+
+
+    
+          
 
 }  
