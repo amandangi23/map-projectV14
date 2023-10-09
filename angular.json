@@ -27,11 +27,10 @@
               "node_modules/bootstrap/dist/css/bootstrap.min.css"
             ],
             "scripts": [
-              "node_modules/path-to-your-google-maps-script.js"
-
+              
             ]
           },
-          "configurations": {
+          "configurations": { 
             "production": {
               "budgets": [
                 {

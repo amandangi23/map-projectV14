@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 declare var google: any;
 
 @Injectable({
@@ -9,8 +9,10 @@ export class MapService {
   private map: google.maps.Map ;
   private autocompleteService: google.maps.places.AutocompleteService;
   private marker: google.maps.Marker | undefined;
-  locationNameUpdated: EventEmitter<string> = new EventEmitter<string>();
+  private locationName: string | undefined;
+   userLocationMarker: google.maps.Marker | undefined;
 
+  @Output() locationNameUpdated: EventEmitter<string> = new EventEmitter<string>();
 
   constructor() {
     this.autocompleteService = new google.maps.places.AutocompleteService();
@@ -25,11 +27,12 @@ export class MapService {
       }, 
       zoom: 4, 
     }); 
-  }
+  };
+
 
   getMap(): google.maps.Map | undefined {
     return this.map;
-  }
+  }; 
 
   getUserLocation(): Promise<{ lat: number; lng: number }> {
     return new Promise((resolve, reject) => {
@@ -40,14 +43,37 @@ export class MapService {
             const longitude = position.coords.longitude;
             resolve({ lat: latitude, lng: longitude });
           },
-          (error) => { 
+          (error) => {
             reject(error);
           }
-        ); 
+        );
       } else {
         reject('Geolocation is not supported by your browser.');
       }
     });
+  }
+
+  setUserLocationMarker(lat: number, lng: number) {
+    if (this.map) { 
+      const userLocation = new google.maps.LatLng(lat, lng);
+ 
+      if (!this.userLocationMarker) {
+        this.userLocationMarker = new google.maps.Marker({
+          position: userLocation,
+          map: this.map,
+          title: 'Your Location'
+        });
+      } else {
+        this.userLocationMarker.setPosition(userLocation);
+      }
+   
+      this.map.setCenter(userLocation);
+      this.map.setZoom(15);
+    }; 
+  }
+
+  getLocationName(): string | undefined {
+    return this.locationName;
   }
 
 
@@ -67,6 +93,21 @@ export class MapService {
           }
         }
       );
+    });
+  };
+
+  reverseGeocode(lat: number, lng: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const geocoder = new google.maps.Geocoder();
+      const latLng = new google.maps.LatLng(lat, lng);
+
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          resolve(results[0].formatted_address);
+        } else {
+          reject('Location not found');
+        }
+      });
     });
   }
   
@@ -100,9 +141,52 @@ export class MapService {
   }
 
 
-  updateLocationName(name: string) {
-    this.locationNameUpdated.emit(name);
-  }
+  
+
+  // addMarker(location: { lat: number; lng: number }, title: string): void {
+  //   if (this.map) {
+  //     if (this.marker) {
+  //       this.marker.setMap(null); // Remove existing marker
+  //     }
+  //     this.marker = new google.maps.Marker({
+  //       position: location,
+  //       map: this.map,
+  //       title: title,
+  //       draggable: true, // Make the marker draggable
+  //     }); 
+
+      
+  //     // Center the map on the selected location
+  //     this.map.setCenter(location);
+  //     this.map.setZoom(15);
+
+
+  //     // Add a dragend event listener to update the marker's position
+  //     this.marker.addListener('dragend', () => {
+  //       const newPosition = this.marker.getPosition();
+  //       if (newPosition) {
+  //         const newLat = newPosition.lat();
+  //         const newLng = newPosition.lng();
+          
+
+  //         console.log(`Marker Dragged to Lat: ${newLat}, Lng: ${newLng}`);
+
+  //         const placeId = this.marker.get("place_id");
+  //         if (placeId) {
+  //           this.getPlaceDetails(placeId).subscribe((placeDetails: any) => {
+  //             if (placeDetails && placeDetails.name) {
+  //               this.locationNameUpdated.emit(placeDetails.name);
+  //             }
+  //           });
+  //         }
+
+  //       }
+  //     });
+  //   }
+  // }
+
+
+
 
   addMarker(location: { lat: number; lng: number }, title: string): void {
     if (this.map) {
@@ -114,33 +198,43 @@ export class MapService {
         map: this.map,
         title: title,
         draggable: true, // Make the marker draggable
-      }); 
-
-      this.marker.addListener('dragend', () => {
-        // Emit the location name when the marker is dragged
-        this.updateLocationName(this.marker.getTitle());
       });
 
       // Center the map on the selected location
       this.map.setCenter(location);
       this.map.setZoom(15);
 
-      this.updateLocationName(title);
+      // Emit the location name when the marker is added
+      this.locationNameUpdated.emit(title);
 
-      // Add a dragend event listener to update the marker's position
+      // Add a dragend event listener to update the marker's position and location name
       this.marker.addListener('dragend', () => {
         const newPosition = this.marker.getPosition();
         if (newPosition) {
           const newLat = newPosition.lat();
           const newLng = newPosition.lng();
-          
 
           console.log(`Marker Dragged to Lat: ${newLat}, Lng: ${newLng}`);
-          // You can update the marker's position as needed here
+
+          // Reverse geocode to get location name
+          const geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ location: newPosition }, (results, status) => {
+            if (status === google.maps.GeocoderStatus.OK) {
+              if (results[0]) {
+                const newLocationName = results[0].formatted_address;
+                this.locationNameUpdated.emit(newLocationName);
+              }
+            } else {
+              console.error('Geocoder failed due to: ' + status);
+            }
+          });
         }
       });
     }
   }
+
+  
+
 
 
   getPlaceDetails(placeId: string): Observable<any> {

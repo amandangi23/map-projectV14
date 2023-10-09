@@ -18,7 +18,10 @@ export class SearchLocationComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.initAutocomplete()
+    this.initAutocomplete();
+    this.mapService.locationNameUpdated.subscribe((locationName: string) => {
+      this.searchQuery = locationName;
+    });
   }
 
  
@@ -44,7 +47,7 @@ export class SearchLocationComponent implements OnInit {
                 const lat = placeDetails.geometry.location.lat();
                 const lng = placeDetails.geometry.location.lng();
                 const locationName = suggestion.description;
-
+  
                 this.mapService.addMarker({ lat, lng }, suggestion.description);
                 this.markerTitle = this.mapService.getTitle();
   
@@ -53,11 +56,9 @@ export class SearchLocationComponent implements OnInit {
                 console.error('Selected suggestion does not have a valid location.');
               }
               
-              // this.mapService.locationNameUpdated.subscribe((locationName: string) => {
-              //   this.searchQuery = locationName;
-              // });
+             
 
-               this.searchQuery = '';
+              
               
             });
           } else {
@@ -65,13 +66,9 @@ export class SearchLocationComponent implements OnInit {
           }
         }
       });
-    }
+    }; 
   }
   
-  
-         
-  
-
   initAutocomplete() {
     const input = document.getElementById('searchInput') as HTMLInputElement;
     const autocomplete = new google.maps.places.Autocomplete(input);
@@ -79,7 +76,16 @@ export class SearchLocationComponent implements OnInit {
       this.ngZone.run(() => {
       });
     });
-  }
 
+    this.mapService.locationNameUpdated.subscribe((locationName: string) => {
+      this.searchQuery = locationName;
+    }); 
+    
+  };
+
+
+
+  
+ 
  
 } 
