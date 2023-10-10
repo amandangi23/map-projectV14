@@ -2,7 +2,7 @@
     position: relative;
     height: 100%;
     width: 100%;
-    transition: opacity 0.3s ease; /* Smooth transition for opacity changes */
+    transition: 0.3s ease; /* Smooth transition for opacity changes */
   }
 
 .search-box {
@@ -29,8 +29,9 @@ a{
 }
 
 .faded {
-   /* background-color: rgba(0, 0, 0, 0.8); Black background with 50% opacity */
-     opacity: 0.8;/* Adjust the opacity level as desired */
+    /* background-color: rgba(0, 0, 0, 0.8) !important; */
+    /* background-color: black; */
+    opacity: 0.8; 
   }
 
 @media (max-width: 767px) {

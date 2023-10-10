@@ -1,4 +1,4 @@
-<div class="map-container">
+<!-- <div class="map-container">
 <div class="search-box">
     <div class="card-body">
         <div>
@@ -24,6 +24,34 @@
     </div>
 </div>
 <div id="map"></div>
-</div>
+</div> -->
+
+
+<div class="map-container">
+    <div class="search-box">
+        <div class="card-body">
+            <div>
+                <input
+                #searchInput
+                type="text"
+                class="form-control mx-1 shadow"
+                placeholder="Search here"
+                name="search"
+                id="searchInput"
+                />
+    
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <a (click)="onCurrentLocationClick()">Use Currunt Location</a> 
+          </div>
+    
+            <br>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-primary">CONFIRM PICK-UP LOCATION</button>
+            </div>
+    
+        </div>
+    </div>
+    <div id="map"></div>
+    </div>
  
 
