@@ -6,7 +6,7 @@ declare var google: any;
   providedIn: 'root'
 })
 export class MapService {
-  private map: google.maps.Map ;
+  private map: google.maps.Map;
   private autocompleteService: google.maps.places.AutocompleteService;
   private marker: google.maps.Marker | undefined;
   private locationName: string | undefined;
@@ -142,51 +142,6 @@ export class MapService {
 
 
   
-
-  // addMarker(location: { lat: number; lng: number }, title: string): void {
-  //   if (this.map) {
-  //     if (this.marker) {
-  //       this.marker.setMap(null); // Remove existing marker
-  //     }
-  //     this.marker = new google.maps.Marker({
-  //       position: location,
-  //       map: this.map,
-  //       title: title,
-  //       draggable: true, // Make the marker draggable
-  //     }); 
-
-      
-  //     // Center the map on the selected location
-  //     this.map.setCenter(location);
-  //     this.map.setZoom(15);
-
-
-  //     // Add a dragend event listener to update the marker's position
-  //     this.marker.addListener('dragend', () => {
-  //       const newPosition = this.marker.getPosition();
-  //       if (newPosition) {
-  //         const newLat = newPosition.lat();
-  //         const newLng = newPosition.lng();
-          
-
-  //         console.log(`Marker Dragged to Lat: ${newLat}, Lng: ${newLng}`);
-
-  //         const placeId = this.marker.get("place_id");
-  //         if (placeId) {
-  //           this.getPlaceDetails(placeId).subscribe((placeDetails: any) => {
-  //             if (placeDetails && placeDetails.name) {
-  //               this.locationNameUpdated.emit(placeDetails.name);
-  //             }
-  //           });
-  //         }
-
-  //       }
-  //     });
-  //   }
-  // }
-
-
-
 
   addMarker(location: { lat: number; lng: number }, title: string): void {
     if (this.map) {

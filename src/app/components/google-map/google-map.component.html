@@ -1,3 +1,29 @@
+<div class="map-container">
+<div class="search-box">
+    <div class="card-body">
+        <div>
+            <input
+            type="text"
+            class="form-control mx-1 shadow"
+            placeholder="Search here"
+            [(ngModel)]="searchQuery"
+            name="search"
+            id="searchInput"
+            (change)="search()"
+            />
+
+        <i class="fa-solid fa-location-crosshairs"></i>
+        <a (click)="getUserLocation()">Use Currunt Location</a> 
+      </div>
+
+        <br>
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary">CONFIRM PICK-UP LOCATION</button>
+        </div>
+
+    </div>
+</div>
 <div id="map"></div>
+</div>
  
 
