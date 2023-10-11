@@ -1,5 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { AfterContentInit, ElementRef, EventEmitter, Injectable, Output } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 
 declare var google: any;
 
@@ -11,13 +12,24 @@ export class MapService {
  private map: google.maps.Map;
  private marker: google.maps.Marker;
  private placesService: google.maps.places.PlacesService ;
+ private apiKey = 'AIzaSyDexp3mENIqw7AggHrsnAIUZadE6MK8McQ';
 
-  constructor(){}
+  constructor(private http: HttpClient){}
+
+  reverseGeocode(lat: number, lng: number): Observable<any> {
+    const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${this.apiKey}`;
+    return this.http.get(apiUrl).pipe(
+      catchError(error => {
+        console.error('Error fetching address:', error);
+        return throwError('Error fetching address');
+      })
+    );
+  }
 
   initializeMap(mapElement: HTMLElement): void {
     this.map = new google.maps.Map(mapElement, {
-      center: { lat: -34.397, lng: 150.644 },
-      zoom: 14
+      center: { lat: 20.5937, lng: 78.9629 },
+      zoom: 14,
     });
 
     this.placesService = new google.maps.places.PlacesService(this.map);
@@ -25,7 +37,12 @@ export class MapService {
     this.marker = new google.maps.Marker({
       position: this.map.getCenter(),
       map: this.map,
-      draggable: true
+      draggable: false
+    });
+
+    google.maps.event.addListener(this.map, 'center_changed', () => {
+      const newCenter = this.map.getCenter();
+      this.marker.setPosition(newCenter);
     });
   }
 

@@ -11,12 +11,22 @@ declare var google: any;
 export class GoogleMapComponent implements AfterContentInit, OnInit{
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>;
   private autocomplete: google.maps.places.Autocomplete;
+  public searchAddress: string = '';
+  private marker: google.maps.Marker;
 
 constructor(private mapService: MapService, private el: ElementRef, private ngZone: NgZone){}
 
 ngOnInit(): void {
   this.mapService.initializeMap(this.el.nativeElement.querySelector('#map'));
+  this.marker = this.mapService.getMarker();
   this.initAutocomplete();
+
+  google.maps.event.addListener(this.marker, 'mouseover', () => {
+    const newPosition = this.marker.getPosition();
+    this.onMarkerPositionChanged(newPosition);
+  });
+ 
+
 }
 
 ngAfterContentInit(): void {
@@ -31,7 +41,6 @@ ngAfterContentInit(): void {
   //   });
   // }
 }
-
 
 
 onCurrentLocationClick(): void {
@@ -91,8 +100,29 @@ private initAutocomplete(): void {
 
 }
 
-}
 
+  // When the marker position changes
+  onMarkerPositionChanged(newPosition: google.maps.LatLng) {
+    const lat = newPosition.lat();
+    const lng = newPosition.lng();
+
+    // Call reverse geocoding service
+    this.mapService.reverseGeocode(lat, lng).subscribe(
+      response => {
+        if (response && response.results && response.results.length > 0) {
+          this.searchAddress = response.results[0].formatted_address;
+        } else {
+          this.searchAddress = 'Address not found';
+        }
+      },
+      error => {
+        console.error('Error fetching address:', error);
+        this.searchAddress = 'Error fetching address';
+      }
+    );
+  }
+
+}
 
 
 // export class GoogleMapComponent implements OnInit  {
