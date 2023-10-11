@@ -94,6 +94,11 @@ private initAutocomplete(): void {
   });
 }
 
+onSearchInputClick(): void {
+  // Clear the input field when clicked
+  this.searchAddress = '';
+}
+
 
 ngOnDestroy(): void {
   this.subscription.unsubscribe();
