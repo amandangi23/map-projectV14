@@ -1,4 +1,5 @@
-import { Component, OnInit, NgZone, Renderer2, ElementRef, AfterContentInit,ViewChild } from '@angular/core';
+import { Component, OnInit, NgZone, Renderer2, ElementRef, AfterContentInit,ViewChild, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { MapService } from 'src/app/services/map.service';
 declare var google: any;
 
@@ -8,7 +9,9 @@ declare var google: any;
   styleUrls: ['./google-map.component.css']
 })
 
-export class GoogleMapComponent implements AfterContentInit, OnInit{
+export class GoogleMapComponent implements AfterContentInit, OnInit, OnDestroy{
+  map: google.maps.Map;
+  subscription:Subscription;
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>;
   private autocomplete: google.maps.places.Autocomplete;
   public searchAddress: string = '';
@@ -17,29 +20,21 @@ export class GoogleMapComponent implements AfterContentInit, OnInit{
 constructor(private mapService: MapService, private el: ElementRef, private ngZone: NgZone){}
 
 ngOnInit(): void {
-  this.mapService.initializeMap(this.el.nativeElement.querySelector('#map'));
+  // this.mapService.initializeMap(this.el.nativeElement.querySelector('#map'));
   this.marker = this.mapService.getMarker();
   this.initAutocomplete();
 
-  google.maps.event.addListener(this.marker, 'mouseover', () => {
-    const newPosition = this.marker.getPosition();
-    this.onMarkerPositionChanged(newPosition);
-  });
- 
+ this.subscription =  this.mapService.locationNameUpdated.subscribe((locationName: string) => {
+          // console.log(locationName);
+          this.searchAddress = locationName;
+        });
 
 }
 
 ngAfterContentInit(): void {
-  // this.mapService.initializeMap(this.el.nativeElement.querySelector('#map'));
-
-  // // Listen for input events on the search input field
-  // const input = document.getElementById('searchInput') as HTMLInputElement;
-  
-  // if (input) {
-  //   input.addEventListener('input', () => {
-  //     this.searchPlaces(input.value);
-  //   });
-  // }
+  this.mapService.initializeMap(this.el.nativeElement.querySelector('#map'));
+  this.map = this.mapService.getMap();
+  this.marker = this.mapService.getMarker();
 }
 
 
@@ -91,183 +86,17 @@ private initAutocomplete(): void {
         console.log(place);
         const location = place.geometry.location;
         this.mapService.setMapCenter(location.lat(), location.lng());
+        // this.mapService.openInfoWindow();
       } else {
         console.error('Invalid place selected:', place);
       }
     });
   });
-
-
 }
 
 
-  // When the marker position changes
-  onMarkerPositionChanged(newPosition: google.maps.LatLng) {
-    const lat = newPosition.lat();
-    const lng = newPosition.lng();
-
-    // Call reverse geocoding service
-    this.mapService.reverseGeocode(lat, lng).subscribe(
-      response => {
-        if (response && response.results && response.results.length > 0) {
-          this.searchAddress = response.results[0].formatted_address;
-        } else {
-          this.searchAddress = 'Address not found';
-        }
-      },
-      error => {
-        console.error('Error fetching address:', error);
-        this.searchAddress = 'Error fetching address';
-      }
-    );
-  }
-
+ngOnDestroy(): void {
+  this.subscription.unsubscribe();
 }
 
-
-// export class GoogleMapComponent implements OnInit  {
-//   locationName: string | undefined;
-//   userLocation: { lat: number; lng: number } | undefined;
-
-//   markerTitle: string | undefined;
-//   searchQuery: string = '';
-
-  
-//   constructor(private mapService: MapService, private ngZone: NgZone, private renderer: Renderer2, private el: ElementRef) {}
-
-//    ngOnInit(): void {
-//        this.mapService.initMap();
-//        this.initAutocomplete();
-//     this.mapService.locationNameUpdated.subscribe((locationName: string) => {
-//       this.searchQuery = locationName;
-//     });
-
-//     const searchInput = this.el.nativeElement.querySelector('#searchInput');
-
-//     // Add event listeners for input focus and blur
-//     this.renderer.listen(searchInput, 'focus', () => {
-//       this.renderer.addClass(this.el.nativeElement.querySelector('.map-container'), 'faded');
-//     });
-
-//     this.renderer.listen(searchInput, 'blur', () => {
-//       this.renderer.removeClass(this.el.nativeElement.querySelector('.map-container'), 'faded');
-//     });
-  
-//    };
-
-//    getUserLocation() {
-//     if ('geolocation' in navigator) {
-//       const options = {
-//         enableHighAccuracy: true, // Request high accuracy mode
-//         timeout: 10000, // Maximum time to wait for location (in milliseconds)
-//         maximumAge: 0 // Disable cache, always get fresh location
-//       };
-
-//       navigator.geolocation.getCurrentPosition(
-//         (position) => {
-//           // Handle the position data
-//           const userLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-
-//           // Check if a user location marker exists, and remove it if it does
-//           if (this.mapService.userLocationMarker) {
-//             this.mapService.userLocationMarker.setMap(null);
-//           }
-
-//           // Create a new user location marker
-//           this.mapService.userLocationMarker = new google.maps.Marker({
-//             position: userLatLng,
-//             map: this.mapService.getMap(),
-//             title: 'Your Location'
-//           });
-
-//           // Center the map on the user's location
-//           this.mapService.getMap().setCenter(userLatLng);
-//           this.mapService.getMap().setZoom(15);
-//         },
-//         (error) => {
-//           // Handle errors
-//           console.error('Error getting user location:', error);
-//         },
-//         options // Pass the options here
-//       );
-//     } else { 
-//       console.error('Geolocation is not supported by your browser.');
-//     }
-//   }   
-
-  
-          
-  
-//   reverseGeocode(lat: number, lng: number) {
-//     this.mapService
-//       .reverseGeocode(lat, lng)
-//       .then((name) => {
-//         this.locationName = name;
-//       })
-//       .catch((error) => {
-//         console.error('Error reverse geocoding:', error);
-//       });
-//   }
-
-  
-//   search() {
-//     if (!this.searchQuery) {
-//       // Display an error message or provide user feedback here
-//       console.log('Invalid location. Please enter a valid location.');
-//       alert('Please enter a valid location.');
-//       return; 
-//     }
-  
-//     if (this.searchQuery) {
-//       this.mapService.searchLocation(this.searchQuery).subscribe((results: any) => {
-//         if (results && results.length > 0) {
-//           const suggestion = results[0]; 
-//           // console.log('Selected Suggestion:', suggestion);
-  
-//           if (suggestion.place_id) {
-//             this.mapService.getPlaceDetails(suggestion.place_id).subscribe((placeDetails: any) => {
-//               if (placeDetails.geometry && placeDetails.geometry.location) {
-//                 const lat = placeDetails.geometry.location.lat();
-//                 const lng = placeDetails.geometry.location.lng();
-//                 const locationName = suggestion.description;
-  
-//                 this.mapService.addMarker({ lat, lng }, suggestion.description);
-//                 this.markerTitle = this.mapService.getTitle();
-  
-//                 console.log(`Selected Location: ${locationName}  - Lat: ${lat}, Lng: ${lng}`); 
-//               } else {  
-//                 console.error('Selected suggestion does not have a valid location.');
-//               }
-              
-             
-
-              
-              
-//             });
-//           } else {
-//             console.error('Selected suggestion does not have a place_id.');
-//           }
-//         }
-//       });
-//     }; 
-//   }
-  
-//   initAutocomplete() {
-//     const input = document.getElementById('searchInput') as HTMLInputElement;
-//     const autocomplete = new google.maps.places.Autocomplete(input);
-//     autocomplete.addListener('place_changed', () => {
-//       this.ngZone.run(() => {
-//       });
-//     });
-
-//     this.mapService.locationNameUpdated.subscribe((locationName: string) => {
-//       this.searchQuery = locationName;
-//     }); 
-    
-//   };
-
-
-    
-          
-
-// }  
+}
