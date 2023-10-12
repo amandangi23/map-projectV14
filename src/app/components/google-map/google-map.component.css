@@ -29,9 +29,9 @@ a{
 }
 
 .faded {
-    /* background-color: rgba(0, 0, 0, 0.8) !important; */
+    background-color: rgba(0, 0, 0, 0.8) !important;
     /* background-color: black; */
-    opacity: 0.8; 
+    /* opacity: 0.8;  */
   }
 
 @media (max-width: 767px) {

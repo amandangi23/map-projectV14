@@ -16,6 +16,7 @@ export class GoogleMapComponent implements AfterContentInit, OnInit, OnDestroy{
   private autocomplete: google.maps.places.Autocomplete;
   public searchAddress: string = '';
   private marker: google.maps.Marker;
+  private infoWindow: google.maps.InfoWindow;
 
 constructor(private mapService: MapService, private el: ElementRef, private ngZone: NgZone){}
 
@@ -28,6 +29,16 @@ ngOnInit(): void {
           // console.log(locationName);
           this.searchAddress = locationName;
         });
+
+    // Create infoWindow with a custom content
+    this.infoWindow = new google.maps.InfoWindow({
+      content: `
+      <div> 
+      <div class="text-primary fw-bold mb-2" style="font-size: 17px">Your laundry will be picked-up here</div> 
+      <div class="text-muted">Please move the map to adjust your location</div>
+       </div>
+      `
+    })
 
 }
 
@@ -46,6 +57,7 @@ onCurrentLocationClick(): void {
         lng: position.coords.longitude
       };
       this.mapService.setMapCenter(userLocation.lat, userLocation.lng);
+      this.infoWindow.open(this.map, this.marker);
     });
   } else {
     alert('Geolocation is not supported by this browser.');
@@ -86,7 +98,7 @@ private initAutocomplete(): void {
         console.log(place);
         const location = place.geometry.location;
         this.mapService.setMapCenter(location.lat(), location.lng());
-        // this.mapService.openInfoWindow();
+        this.infoWindow.open(this.map, this.marker);
       } else {
         console.error('Invalid place selected:', place);
       }

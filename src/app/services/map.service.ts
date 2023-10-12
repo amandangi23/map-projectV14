@@ -12,7 +12,6 @@ export class MapService {
  private map: google.maps.Map;
  private marker: google.maps.Marker;
  private placesService: google.maps.places.PlacesService ;
-//  private infoWindow: google.maps.InfoWindow;
 
 locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
@@ -36,34 +35,13 @@ locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
       }
     });
 
-    const infoWindowContent = `
-    <div data-toggle="tooltip" data-placement="top" title="Tooltip on top"> 
-    <div class="text-primary fw-bold mb-2" style="font-size: 17px">Your laundry will be picked-up here</div> 
-    <div class="text-muted">Please move the map to adjust your location</div> </div>
-    `;
-
-    // Create infoWindow with a custom content
-    // this.infoWindow = new google.maps.infoWindow({
-    //   content: infoWindowContent
-    // })
-
 
     google.maps.event.addListener(this.map, 'center_changed', () => {
       const newCenter = this.map.getCenter();
       this.marker.setPosition(newCenter);
       this.updateLocationInfo(newCenter.lat(), newCenter.lng());
     });
-
-    // this.marker.addListener('click', () => {
-    //   this.infoWindow.open(this.map, this.marker);
-    // });
   }
-
-  // openInfoWindow(){
-  //   if(this.infoWindow){
-  //     this.infoWindow.open(this.map, this.marker);
-  //   }
-  // }
     
  
   setMapCenter(lat: number, lng: number): void {
