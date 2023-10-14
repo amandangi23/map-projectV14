@@ -7,9 +7,9 @@
 
 .search-box {
     height: 150px;
-    width: 325px;
+    width: 400px;
     position: absolute;
-    top: 70px;
+    top: 100px;
     left: 50px;
     z-index: 1;
     background-color: white;
@@ -34,12 +34,21 @@ a{
     /* opacity: 0.8;  */
   }
 
+
+  .pac-container, .pac-item {
+    white-space: normal; /* Allow text to wrap within the input field */
+    overflow: hidden; /* Hide overflowing text */
+    height: auto !important; /* Automatically adjust the height based on content */
+}
+
+
 @media (max-width: 767px) {
     .search-box {
       position: fixed;
-      bottom: 20px;
+      bottom: 25px;
       top: auto;
-      left: 20px;
+      left: 10px;
+      width: 330px;
     }
 }
 

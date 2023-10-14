@@ -9,7 +9,7 @@ declare var google: any;
   styleUrls: ['./google-map.component.css']
 })
 
-export class GoogleMapComponent implements AfterContentInit, OnInit, OnDestroy{
+export class GoogleMapComponent implements AfterContentInit, OnInit, OnDestroy {
   map: google.maps.Map;
   subscription:Subscription;
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>;
@@ -40,6 +40,7 @@ ngOnInit(): void {
       `
     })
 
+    // this.getCurrentLocation();
 }
 
 ngAfterContentInit(): void {
@@ -48,21 +49,52 @@ ngAfterContentInit(): void {
   this.marker = this.mapService.getMarker();
 }
 
-
-onCurrentLocationClick(): void {
+getCurrentLocation(): void {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const userLocation = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-      this.mapService.setMapCenter(userLocation.lat, userLocation.lng);
-      this.infoWindow.open(this.map, this.marker);
-    });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        this.mapService.setMapCenter(userLocation.lat, userLocation.lng);
+        this.infoWindow.open(this.map, this.marker);
+      },
+      (error) => {
+        console.error('Error getting current location:', error);
+      }
+    );
   } else {
-    alert('Geolocation is not supported by this browser.');
+    console.error('Geolocation is not supported by this browser.');
   }
 }
+
+private initAutocomplete(): void {
+    this.autocomplete = new google.maps.places.Autocomplete(
+      document.getElementById('searchInput') as HTMLInputElement,
+      {
+        types: ['geocode'] // Specify the type of place data to return
+      }
+    );
+  
+    this.autocomplete.addListener('place_changed', () => {
+      this.ngZone.run(() => {
+        const place: google.maps.places.PlaceResult = this.autocomplete.getPlace();
+        if (place.geometry && place.geometry.location) {
+          // Handle the selected place here
+          console.log(place);
+          const location = place.geometry.location;
+          this.mapService.setMapCenter(location.lat(), location.lng());
+
+          this.infoWindow.open(this.map, this.marker);
+        } else {
+          console.error('Invalid place selected:', place);
+        }
+      });
+    });
+  }
+
+
 
 searchPlaces(query: string): void {
   const placesService = this.mapService.getPlacesService();
@@ -82,29 +114,6 @@ searchPlaces(query: string): void {
   });
 }
 
-private initAutocomplete(): void {
-  this.autocomplete = new google.maps.places.Autocomplete(
-    document.getElementById('searchInput') as HTMLInputElement,
-    {
-      types: ['geocode'] // Specify the type of place data to return
-    }
-  );
-
-  this.autocomplete.addListener('place_changed', () => {
-    this.ngZone.run(() => {
-      const place: google.maps.places.PlaceResult = this.autocomplete.getPlace();
-      if (place.geometry && place.geometry.location) {
-        // Handle the selected place here
-        console.log(place);
-        const location = place.geometry.location;
-        this.mapService.setMapCenter(location.lat(), location.lng());
-        this.infoWindow.open(this.map, this.marker);
-      } else {
-        console.error('Invalid place selected:', place);
-      }
-    });
-  });
-}
 
 onSearchInputClick(): void {
   // Clear the input field when clicked

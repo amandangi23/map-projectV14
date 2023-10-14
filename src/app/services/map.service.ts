@@ -19,8 +19,8 @@ locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   initializeMap(mapElement: HTMLElement): void {
     this.map = new google.maps.Map(mapElement, {
-      center: { lat: 20.5937, lng: 78.9629 },
-      zoom: 14,
+      center: { lat: 28.7041, lng: 77.1025 },
+      zoom: 12,
     });
 
     this.placesService = new google.maps.places.PlacesService(this.map);
@@ -29,10 +29,10 @@ locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
       position: this.map.getCenter(),
       map: this.map,
       draggable: false,
-      icon:{
-        url:'/assets/pin.png', 
-        scaledSize: new google.maps.Size(50, 40),
-      }
+      // icon:{
+      //   url:'/assets/pin.png', 
+      //   scaledSize: new google.maps.Size(50, 40),
+      // }
     });
 
 
