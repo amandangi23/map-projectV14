@@ -20,7 +20,7 @@ locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
   initializeMap(mapElement: HTMLElement): void {
     this.map = new google.maps.Map(mapElement, {
       center: { lat: 28.7041, lng: 77.1025 },
-      zoom: 12,
+      zoom: 13,
     });
 
     this.placesService = new google.maps.places.PlacesService(this.map);
@@ -41,6 +41,10 @@ locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
       this.marker.setPosition(newCenter);
       this.updateLocationInfo(newCenter.lat(), newCenter.lng());
     });
+  }
+
+  setMapZoomLevel(zoomLevel: number): void {
+    this.map.setZoom(zoomLevel);
   }
     
  

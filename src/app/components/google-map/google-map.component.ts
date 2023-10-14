@@ -58,6 +58,7 @@ getCurrentLocation(): void {
           lng: position.coords.longitude
         };
         this.mapService.setMapCenter(userLocation.lat, userLocation.lng);
+        this.mapService.setMapZoomLevel(18);
         this.infoWindow.open(this.map, this.marker);
       },
       (error) => {
@@ -85,7 +86,7 @@ private initAutocomplete(): void {
           console.log(place);
           const location = place.geometry.location;
           this.mapService.setMapCenter(location.lat(), location.lng());
-
+          this.mapService.setMapZoomLevel(18);
           this.infoWindow.open(this.map, this.marker);
         } else {
           console.error('Invalid place selected:', place);
