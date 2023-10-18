@@ -14,6 +14,8 @@ export class MapService {
  private placesService: google.maps.places.PlacesService ;
 
 locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
+locationDetailUpdated: BehaviorSubject<object> = new BehaviorSubject<object>(null);
+
 
   constructor(private http: HttpClient){}
 
@@ -62,7 +64,10 @@ locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
       if (status === google.maps.GeocoderStatus.OK) {
         if (results[0]) {
           const address = results[0].formatted_address;
+          const addressDetail = results[0];
+
           this.locationNameUpdated.next(address);
+          this.locationDetailUpdated.next(addressDetail);
         } else {
           this.locationNameUpdated.next('Address not found');
         }
@@ -84,6 +89,7 @@ locationNameUpdated: BehaviorSubject<string> = new BehaviorSubject<string>('');
   getPlacesService(): google.maps.places.PlacesService {
     return this.placesService;
   }
+
 
 }
 

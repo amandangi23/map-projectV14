@@ -11,12 +11,14 @@ declare var google: any;
 
 export class GoogleMapComponent implements AfterContentInit, OnInit, OnDestroy {
   map: google.maps.Map;
-  subscription:Subscription;
+  subscription: Subscription;
+  locDetSubscription: Subscription;
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>;
   private autocomplete: google.maps.places.Autocomplete;
   public searchAddress: string = '';
   private marker: google.maps.Marker;
   private infoWindow: google.maps.InfoWindow;
+  private locationDetail:object = null;
 
 constructor(private mapService: MapService, private el: ElementRef, private ngZone: NgZone){}
 
@@ -27,8 +29,11 @@ ngOnInit(): void {
 
  this.subscription =  this.mapService.locationNameUpdated.subscribe((locationName: string) => {
           // console.log(locationName);
-          this.searchAddress = locationName;
+            this.searchAddress = locationName;
         });
+ this.locDetSubscription = this.mapService.locationDetailUpdated.subscribe((locationDetail:Object) => {
+                        this.locationDetail = locationDetail
+        })
 
     // Create infoWindow with a custom content
     this.infoWindow = new google.maps.InfoWindow({
@@ -39,8 +44,6 @@ ngOnInit(): void {
        </div>
       `
     })
-
-    // this.getCurrentLocation();
 }
 
 ngAfterContentInit(): void {
@@ -83,7 +86,7 @@ private initAutocomplete(): void {
         const place: google.maps.places.PlaceResult = this.autocomplete.getPlace();
         if (place.geometry && place.geometry.location) {
           // Handle the selected place here
-          console.log(place);
+          // console.log(place);
           const location = place.geometry.location;
           this.mapService.setMapCenter(location.lat(), location.lng());
           this.mapService.setMapZoomLevel(18);
@@ -121,9 +124,57 @@ onSearchInputClick(): void {
   this.searchAddress = '';
 }
 
+pickupLocation(){
+  if(this.searchAddress && this.locationDetail){
+    console.log(this.searchAddress);
+    // console.log(this.locationDetail);
+    const location = this.getAddressComponents(this.locationDetail);
+    console.log(location);
+  }
+  
+}
+
+ getAddressComponents(data) {
+  const result = {
+    fullAddress: '',
+    // address: '',
+    pincode: '',
+    city: '',
+    state: '',
+    country: '',
+    latitude: null,
+    longitude: null
+  };
+
+  result.fullAddress = data.formatted_address;
+
+  data.address_components.forEach(component => {
+    const types = component.types;
+      if (types.includes('locality')) {
+      result.city = component.long_name;
+    } else if (types.includes('administrative_area_level_1')) {
+      result.state = component.long_name;
+    } else if (types.includes('postal_code')) {
+      result.pincode = component.long_name;
+    } else if (types.includes('country')) {
+      result.country = component.long_name;
+    }
+
+    // Extracting latitude and longitude from geometry
+  if (data.geometry && data.geometry.location) {
+    result.latitude = data.geometry.location.lat();
+    result.longitude = data.geometry.location.lng();
+  }
+  });
+
+  return result;
+}
+
 
 ngOnDestroy(): void {
+
   this.subscription.unsubscribe();
+  this.locDetSubscription.unsubscribe();
 }
 
 }
